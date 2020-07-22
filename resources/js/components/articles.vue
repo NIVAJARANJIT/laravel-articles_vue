@@ -1,6 +1,16 @@
 <template>
   <div>
     <h2>Articles</h2>
+    <form @submit.prevent="addArticle" class="mb-3">
+      <div class="form-group">
+        <input type="text" class="form-control" placeholder="Title" v-model="article.title" />
+      </div>
+      <div class="form-group">
+        <textarea class="form-control" placeholder="Body" v-model="article.body"></textarea>
+      </div>
+      <button type="submit" class="btn btn-light btn-block">Save</button>
+    </form>
+    <button @click="clearForm()" class="btn btn-danger btn-block">Cancel</button>
     <nav aria-label="Page navigation example">
       <ul class="pagination">
         <li v-bind:class="[{disabled: !pagination.prev_page_url}]" class="page-item">
@@ -20,9 +30,10 @@
       </ul>
     </nav>
     <div class="card card-body mb-2" v-for="article in articles" v-bind:key="article.id">
-      <h3>{{article.title}}</h3>
-      <p>{{article.body}}</p>
+      <h3>{{ article.title }}</h3>
+      <p>{{ article.body }}</p>
       <hr />
+      <button @click="editArticle(article)" class="btn btn-warning mb-2">Edit</button>
       <button @click="deleteArticle(article.id)" class="btn btn-danger">Delete</button>
     </div>
   </div>
@@ -47,6 +58,7 @@ export default {
   created() {
     this.fetchArticles();
   },
+
   methods: {
     fetchArticles(page_url) {
       let vm = this;
@@ -81,6 +93,55 @@ export default {
           })
           .catch(err => console.log(err));
       }
+    },
+    addArticle() {
+      if (this.edit === false) {
+        // Add
+        fetch("api/article", {
+          method: "post",
+          body: JSON.stringify(this.article),
+          headers: {
+            "content-type": "application/json"
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            this.clearForm();
+            alert("Article Added");
+            this.fetchArticles();
+          })
+          .catch(err => console.log(err));
+      } else {
+        // Update
+        fetch("api/article", {
+          method: "put",
+          body: JSON.stringify(this.article),
+          headers: {
+            "content-type": "application/json"
+          }
+        })
+          .then(res => res.json())
+          .then(data => {
+            this.clearForm();
+            alert("Article Updated");
+            this.fetchArticles();
+          })
+          .catch(err => console.log(err));
+      }
+    },
+    editArticle(article) {
+      this.edit = true;
+      this.article.id = article.id;
+      this.article.article_id = article.id;
+      this.article.title = article.title;
+      this.article.body = article.body;
+    },
+    clearForm() {
+      this.edit = false;
+      this.article.id = null;
+      this.article.article_id = null;
+      this.article.title = "";
+      this.article.body = "";
     }
   }
 };

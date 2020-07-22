@@ -16,22 +16,13 @@ class ArticleController extends Controller
      */
     public function index()
     {
-        //Get article
-        $articles=Article::orderBy('created_at','desc')->paginate(5);
+        // Get articles
+        $articles = Article::orderBy('created_at', 'desc')->paginate(5);
 
-        //return collection of articles as resource
+        // Return collection of articles as a resource
         return ArticleResource::collection($articles);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
-    public function create()
-    {
-        //
-    }
 
     /**
      * Store a newly created resource in storage.
@@ -41,16 +32,16 @@ class ArticleController extends Controller
      */
     public function store(Request $request)
     {
-        $article=$request->isMethod('put') ? Article::findOrFail('$request->article_id') : new Article;
+        $article = $request->isMethod('put') ? Article::findOrFail($request->article_id) : new Article;
 
-        $article->id=$request->input('article_id');
-        $article->title=$request->input('title');
-        $article->body=$request->input('body');
+        $article->id = $request->input('article_id');
+        $article->title = $request->input('title');
+        $article->body = $request->input('body');
 
-        if($article->save()){
+        if($article->save()) {
             return new ArticleResource($article);
         }
-
+        
     }
 
     /**
@@ -61,33 +52,11 @@ class ArticleController extends Controller
      */
     public function show($id)
     {
-        $article=Article::findOrFail($id);
+        // Get article
+        $article = Article::findOrFail($id);
 
-        //show single article as article
+        // Return single article as a resource
         return new ArticleResource($article);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function edit($id)
-    {
-        //
-    }
-
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function update(Request $request, $id)
-    {
-        //
     }
 
     /**
@@ -98,12 +67,11 @@ class ArticleController extends Controller
      */
     public function destroy($id)
     {
-        $article=Article::findOrFail($id);
+        // Get article
+        $article = Article::findOrFail($id);
 
-        //delete single article as article
-        if($article->delete()){
+        if($article->delete()) {
             return new ArticleResource($article);
-        }
-        
+        }    
     }
 }
